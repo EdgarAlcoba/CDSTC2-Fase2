@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  frontend:
+    tty: true
+    stdin_open: true
+    build: ./frontend/docGPT/
+    container_name: frontend-container
+    volumes:
+      - ./frontend/docGPT/src:/app/src:ro
+    ports:
+      - "3000:3000"
+    environment:
+      - WATCHPACK_POLLING=true #Necesario para usuarios con windows
+
+

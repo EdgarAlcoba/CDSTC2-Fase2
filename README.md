@@ -1,0 +1,1 @@
+# En este repositorio se encuentra la aplicación desarrollada por el equipo sinco para la fase 2 de la segunda edición del CDS Tech Challenge
