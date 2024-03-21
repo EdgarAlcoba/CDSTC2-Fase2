@@ -1,7 +1,7 @@
 import React from 'react'
 import Navbar from './Navbar'
 import './Home.css'
-import videoBG from '../Assets/HomeBackground.mov'
+import videoBG from '../Assets/HomeBackground.mp4'
 import Logo from '../Assets/docGPTLogo.svg';
 
 const Home = () => {
