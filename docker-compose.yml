@@ -13,4 +13,14 @@ services:
     environment:
       - WATCHPACK_POLLING=true #Necesario para usuarios con windows
 
-
+  backend:
+    build: ./backend
+    restart: always
+    container_name: backend-container
+    volumes:
+      - ./backend:/backend:ro
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - NODE_ENV=${NODE_ENV}
