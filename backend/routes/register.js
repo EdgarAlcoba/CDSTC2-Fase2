@@ -6,6 +6,18 @@ const Conversation = require("../models/Conversation"); // Import Conversation m
 router.post("/", async function (req, res) {
   const { username, password } = req.body;
 
+  if (!username) {
+    res.status(400).json({
+      error: "Username not found"
+    });
+  }
+
+  if (!password) {
+    res.status(400).json({
+      error: "Password not found"
+    });
+  }
+
   try {
     let user = await User.findOne({ username });
 
@@ -15,21 +27,6 @@ router.post("/", async function (req, res) {
 
     // Create the user
     user = new User({ username, password });
-    await user.save();
-
-    // Create a random conversation
-    const conversation = new Conversation({
-      title: "Random Conversation",
-      messages: [] // You can add messages here if needed
-    });
-
-    // Save the conversation
-    await conversation.save();
-
-    // Associate the conversation with the user
-    user.conversations.push(conversation._id);
-
-    console.log(user)
     await user.save();
 
     return res.status(200).send();

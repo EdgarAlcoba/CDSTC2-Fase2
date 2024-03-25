@@ -6,8 +6,19 @@ const jwt = require('jsonwebtoken');
 
 
 router.post("/", async function (req, res) {
-  const username = req.body.username;
-  const password = req.body.password;
+  const { username, password } = req.body;
+
+  if (!username) {
+    res.status(400).json({
+      error: "Username not found"
+    });
+  }
+
+  if (!password) {
+    res.status(400).json({
+      error: "Password not found"
+    });
+  }
 
   try {
     const loggedUser = await User.findOne({ username: username });
