@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const User = require("../models/User");
 const Conversation = require("../models/Conversation");
 const Message = require("../models/Message");
+const {json} = require("express");
 
 router.get("/", async function (req, res) {
     const userID = req.userData.id;
@@ -78,10 +79,17 @@ router.get("/:conversationID", async function (req, res) {
 
     for (const conversation of user.conversations) {
         if (conversation.toString() === conversationId) {
-            let messages = await Conversation.findById(conversationId).populate().messages
-            console.log(await Conversation.findById(conversationId).populate())
-            if (!messages) return res.status(200).json([]);
-            return res.status(200).json(messages)
+            let conversationObject = await Conversation.findById(conversationId).populate()
+            let messagesArray = []
+            for (const message of conversationObject.messages) {
+                const messageObject = await Message.findById(message).populate()
+                messagesArray.push({
+                    type: messageObject.type,
+                    message: messageObject.message
+                });
+            }
+            if (messagesArray.length === 0) return res.status(200).json([]);
+            return res.status(200).json(messagesArray)
         }
     }
 
