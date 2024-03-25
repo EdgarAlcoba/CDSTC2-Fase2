@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(cors());
 app.use("/api/login", require("./routes/login"));
 app.use("/api/register", require("./routes/register"));
-app.use("/api/user", require("./routes/user"));
+app.use("/api/chat", require("./routes/user"));
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("../frontend/docGPT/build"));
@@ -21,7 +21,5 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.listen(5000, function () {
-  console.log(process.env.NODE_ENV);
-  console.log(process.env.MONGO_URI);
   console.log("Servidor arrancado en el puerto 5000!");
 });

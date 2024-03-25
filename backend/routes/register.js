@@ -8,16 +8,16 @@ router.post("/", async function (req, res) {
   const loggedUser = await User.findOne({ username: username });
 
   if (!loggedUser) {
-    const wait = await User.create({username:username,password:password});
-    if(!wait){
-        return res.status(400).send("User could not be registered, try again later please");
-    }else{
-        return res.sendStatus(200);
+    const wait = await User.create({ username: username, password: password });
+    if (!wait) {
+      return res.status(400).send("User could not be registered, try again later please");
+    } else {
+      return res.sendStatus(200);
     }
-  }else{
+  } else {
     return res.status(400).send("User already exists");
   }
-  
+
 });
 
 module.exports = router;

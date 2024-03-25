@@ -3,25 +3,25 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 let User = new Schema({
-    username:{
-        type: String,
-        required: true,
-        unique: true,
-        index: true
-    },
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+    index: true
+  },
 
-    password: {
-        type: String,
-        required: true
-    },
+  password: {
+    type: String,
+    required: true
+  },
 
-    conversations:[{
-        type: Schema.Types.ObjectId,
-        ref: 'Conversation'
-    }],
+  conversations: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Conversation'
+  }],
 });
 
-User.pre('save', async function(next) {
+User.pre('save', async function (next) {
   const user = this;
   if (!user.isModified('password')) return next();
 

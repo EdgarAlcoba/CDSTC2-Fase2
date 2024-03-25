@@ -2,16 +2,15 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 let Conversation = new Schema({
-    type:{
+    title: {
         type: String,
         required: true,
     },
 
-    message:{
-        type: String
-    }
+    messages: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Message'
+    }]
 });
-
-//TODO encriptar mensajes antes de guardarlos
 
 module.exports = mongoose.model('Conversation', Conversation);
