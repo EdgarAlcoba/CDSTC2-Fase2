@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 let Conversation = new Schema({
     title: {
         type: String,
-        required: true,
+        required: true
     },
 
     messages: [{

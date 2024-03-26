@@ -1,39 +1,23 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
-const Conversation = require("../models/Conversation"); // Import Conversation model
 
 router.post("/", async function (req, res) {
-  const { username, password } = req.body;
+  const username = req.body.username;
+  const password = req.body.password;
+  const loggedUser = await User.findOne({ username: username });
 
-  if (!username) {
-    res.status(400).json({
-      error: "Username not found"
-    });
-  }
-
-  if (!password) {
-    res.status(400).json({
-      error: "Password not found"
-    });
-  }
-
-  try {
-    let user = await User.findOne({ username });
-
-    if (user) {
-      return res.status(400).send({ error: "User already exists" });
+  if (!loggedUser) {
+    const wait = await User.create({ username: username, password: password });
+    if (!wait) {
+      return res.status(400).send("User could not be registered, try again later please");
+    } else {
+      return res.sendStatus(200);
     }
-
-    // Create the user
-    user = new User({ username, password });
-    await user.save();
-
-    return res.status(200).send();
-  } catch (error) {
-    console.error("Error registering user:", error);
-    return res.status(500).send();
+  } else {
+    return res.status(400).send("User already exists");
   }
+
 });
 
 module.exports = router;

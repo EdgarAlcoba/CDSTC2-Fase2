@@ -4,145 +4,132 @@ const bcrypt = require('bcryptjs');
 const User = require("../models/User");
 const Conversation = require("../models/Conversation");
 const Message = require("../models/Message");
-const {json} = require("express");
 
-router.get("/", async function (req, res) {
-    const userID = req.userData.id;
+router.get("/:userID", async function (req, res) {
+    const userID = req.params.userID;
+
     try {
-        User.findById(userID)
-            .populate()
+        User.findById(userID).populate('conversations')
             .then((user) => {
                 res.send(user.conversations);
             })
             .catch((error) => {
-                console.error("User specified in the JWT token (" + userID + + "not found: " + error)
-                return res.status(500).send();
+                res.status(400).send("User not found");
             });
     } catch (error) {
-        console.error("Error fetching user conversations:", error);
-        return res.status(500).send();
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 });
 
-router.post("/", async function (req, res) {
-    const userID = req.userData.id;
+router.post("/:userID", async function (req, res) {
+    const userID = req.params.userID;
     const conversationName = req.body.conversationName;
     let user;
 
-    try {
-        user = await User.findById(userID).populate()
-    } catch (error) {
-        console.error("User specified in the JWT token (" + userID + + "not found: " + error)
-        return res.status(500).send();
+    if (!conversationName) {
+        return res.status(400).json({
+            error: "Conversation name not found"
+        });
     }
 
     try {
-        if (!conversationName) {
-            return res.status(400).json({
-                error: "Conversation name not found"
-            });
-        }
+        user = await User.findById(userID)
+    } catch (error) {
+        return res.status(400).send("User not found");
+    }
 
+    try {
         const conversation = new Conversation({
             title: conversationName,
             messages: []
         });
+        await conversation.save();
+        user.conversations.push(conversation._id);
+        await user.save();
+        res.sendStatus(200);
+    } catch (error) {
+        return res.status(500).send("Error creating new conversation")
+    }
+});
 
+router.get("/:userID/:conversationID", async function (req, res) {
+    const userID = req.params.userID;
+    const conversationId = req.params.conversationID;
+    let user;
+
+    try {
+        user = await User.findById(userID);
+    } catch (error) {
+        return res.status(400).send("User not found");
+    }
+
+    if (user.conversations.some(id => id.equals(conversationId))) {
+        Conversation.findById(conversationId).populate('messages')
+            .then((conversation) => {
+                const decryptedMessages = conversation.messages.map(message => ({
+                    type: message.type,
+                    message: message.decrypt()
+                }));
+
+                res.send(decryptedMessages);
+            })
+            .catch((error) => {
+                res.status(400).send("Conversation not found");
+            });
+    } else {
+        res.status(400).send("ConversationID not valid");
+    }
+});
+
+router.put("/:userID/:conversationID", async function (req, res) {
+    const userID = req.params.userID;
+    const conversationID = req.params.conversationID;
+    const messageType = req.body.type;
+    const messageContent = req.body.message;
+
+    if (!messageType) {
+        return res.status(400).send("Message type not found");
+    }
+
+    if (!messageContent) {
+        return res.status(400).send("Message not found");
+    }
+
+    let user;
+
+    try {
+        user = await User.findById(userID);
+    } catch (error) {
+        return res.status(400).send("User not found");
+    }
+
+    let conversation;
+
+    if (user.conversations.some(id => id.equals(conversationID))) {
+        try {
+            conversation = await Conversation.findById(conversationID);
+        } catch (error) {
+            return res.status(500).send("Conversation not found");
+        }
+    } else {
+        res.status(400).send("ConversationID not valid");
+    }
+
+    try {
+        const message = new Message({
+            type: messageType,
+            message: messageContent
+        });
+        await message.save();
+        conversation.messages.push(message._id);
         await conversation.save();
 
-        user.conversations.push(conversation._id);
-        await user.save()
+        return res.sendStatus(200);
+
     } catch (error) {
-        console.error("Error creating user conversation", error);
-        return res.status(500).send();
+        console.log(error);
+        return res.status(400).send("Error creating new message");
     }
-
-    try {
-        res.send(user.conversations);
-    } catch (error) {
-        console.error("Error fetching user conversations", error);
-        return res.status(500).send();
-    }
-});
-
-router.get("/:conversationID", async function (req, res) {
-    const userID = req.userData.id;
-    const conversationId = req.params.conversationID;
-    let user;
-
-    try {
-        user = await User.findById(userID).populate()
-    } catch (error) {
-        console.error("User specified in the JWT token (" + userID + + "not found: " + error)
-        return res.status(500).send();
-    }
-
-    for (const conversation of user.conversations) {
-        if (conversation.toString() === conversationId) {
-            let conversationObject = await Conversation.findById(conversationId).populate()
-            let messagesArray = []
-            for (const message of conversationObject.messages) {
-                const messageObject = await Message.findById(message).populate()
-                messagesArray.push({
-                    type: messageObject.type,
-                    message: messageObject.message
-                });
-            }
-            if (messagesArray.length === 0) return res.status(200).json([]);
-            return res.status(200).json(messagesArray)
-        }
-    }
-
-    return res.status(400).json({
-        error: "The conversation ID was not found"
-    })
-});
-
-router.put("/:conversationID", async function (req, res) {
-    const userID = req.userData.id;
-    const messageType = req.body.type;
-    const msg = req.body.message;
-    const conversationId = req.params.conversationID;
-    let user;
-
-    try {
-        user = await User.findById(userID).populate()
-    } catch (error) {
-        console.error("User specified in the JWT token (" + userID + + "not found: " + error)
-        return res.status(500).send();
-    }
-
-    for (const conversation of user.conversations) {
-        if (conversation.toString() === conversationId) {
-            let conversationObject = await Conversation.findById(conversationId).populate()
-
-            if (!messageType) {
-                return res.status(400).json({
-                    error: "Message type not found"
-                });
-            }
-
-            if (!msg) {
-                return res.status(400).json({
-                    error: "Message not found"
-                });
-            }
-
-            const message = new Message({
-                type: messageType,
-                message: msg
-            });
-            await message.save();
-
-            conversationObject.messages.push(message._id)
-            await conversationObject.save()
-
-            return res.status(200).send()
-        }
-    }
-    return res.status(400).json({
-        error: "The conversation ID was not found"
-    })
 });
 
 module.exports = router;
