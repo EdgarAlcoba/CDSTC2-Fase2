@@ -52,7 +52,7 @@ nav:hover {
     max-width: 200px;
 }
 
-.navbar-links-container a {
+.navbar-links-container .navbar-link {
     margin-right: 3.2rem;
     text-decoration: none;
     color: black;
@@ -60,7 +60,11 @@ nav:hover {
     font-weight: 700;
 }
 
-.navbar-links-container a:hover {
+.navbar-links-container .button-link {
+    margin-right: 3.2rem;
+}
+
+.navbar-links-container .navbar-link:hover {
     background-color: transparent;
     box-shadow: 0px 3px rgba(0, 0, 0, 0.7);
     box-shadow: inset;

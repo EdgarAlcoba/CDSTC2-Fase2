@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Logo from '../Assets/docGPTAltLogo.svg';
-import { Box, Drawer, ListItem, ListItemButton, ListItemIcon, ListItemText, listItemTextClasses, List } from "@mui/material";
+import { Box, Drawer, ListItem, ListItemButton, ListItemIcon, ListItemText, List } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import InfoIcon from "@mui/icons-material/Info";
 import { HiOutlineBars3 } from "react-icons/hi2";
@@ -21,16 +22,18 @@ const Navbar = () => {
   return (
     <nav>
       <div className="nav-logo-container">
-        <img src={Logo} alt="DocGPT" />
+        <Link to="/">
+          <img src={Logo} alt="DocGPT" />
+        </Link>
       </div>
       <div className="navbar-links-container">
-        <a href="">Home</a>
-        <a href="">Info</a>
-        <a href="/login">
+        <Link to="/" className="navbar-link">Home</Link>
+        <Link to="/info" className="navbar-link">Info</Link>
+        <Link to="/login" className="button-link">
           <button className="primary-button">
             Login
           </button>
-        </a>
+        </Link>
       </div>
       <div className="navbar-menu-container">
         <HiOutlineBars3 onClick={() => setOpenMenu(true)} />
@@ -42,14 +45,14 @@ const Navbar = () => {
           onClick={() => setOpenMenu(false)}
           onkeyDown={() => setOpenMenu(false)}
         >
-          <List style={{ width: '100%'}}>
+          <List style={{ width: '100%' }}>
             {menuOptions.map((item) => (
               <ListItem key={item.text} disablePadding >
-                <ListItemButton style={{ width: '100%'}} sx={{alignItems:'center'}}>
+                <ListItemButton style={{ width: '100%' }} sx={{ alignItems: 'center' }}>
                   <ListItemIcon>
                     {item.icon}
                   </ListItemIcon>
-                  <ListItemText primary={item.text}  sx={{ fontSize: '20px !important' }} />
+                  <ListItemText primary={item.text} sx={{ fontSize: '20px !important' }} />
                 </ListItemButton>
               </ListItem>
             ))}

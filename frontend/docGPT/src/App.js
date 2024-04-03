@@ -4,6 +4,7 @@ import FacebookLogin from '@greatsumini/react-facebook-login';
 import LoginForm from './Components/LoginForm/LoginForm';
 import RegisterForm from './Components/RegisterForm/RegisterForm';
 import Home from './Components/HomePage/Home';
+import Info from './Components/InfoPage/Info';
 import Chat from './Components/Chat/Chat';
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
@@ -23,6 +24,7 @@ function App() {
       <Router>
         <Routes>
           <Route path='/' element={<Home />} />
+          <Route path='/info' element={<Info />} />
           <Route path='/login' element={<LoginForm />} />
           <Route path='/register' element={<RegisterForm />} />
           <Route path='/chat/:userID' element={<Chat />} />
