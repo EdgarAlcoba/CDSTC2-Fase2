@@ -132,4 +132,54 @@ router.put("/:userID/:conversationID", async function (req, res) {
     }
 });
 
+router.get("/:userID/:conversationID/messageAI", async function (req, res) {
+    const userID = req.params.userID;
+    const conversationID = req.params.conversationID;
+    const messageContent = req.body.message;
+
+    if (!messageContent) {
+        return res.status(400).send("Message not found");
+    }
+
+    let user;
+
+    try {
+        user = await User.findById(userID);
+    } catch (error) {
+        return res.status(400).send("User not found");
+    }
+
+    let conversation;
+
+    if (user.conversations.some(id => id.equals(conversationID))) {
+        try {
+            conversation = await Conversation.findById(conversationID);
+        } catch (error) {
+            return res.status(500).send("Conversation not found");
+        }
+    } else {
+        res.status(400).send("ConversationID not valid");
+    }
+
+    //TODO hacer llamada a la api del modelo
+
+    const aiMessage = "";
+
+    try {
+        const message = new Message({
+            type: "DocGPT",
+            message: aiMessage
+        });
+        await message.save();
+        conversation.messages.push(message._id);
+        await conversation.save();
+
+        return res.sendStatus(200);
+
+    } catch (error) {
+        console.log(error);
+        return res.status(400).send("Error creating response");
+    }
+});
+
 module.exports = router;

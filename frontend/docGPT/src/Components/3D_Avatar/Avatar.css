@@ -1,0 +1,37 @@
+.avatar {
+    display: block;
+    width:100%;
+    height:100%;
+}
+
+.controls {
+    display: block;
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    height: 50px;
+}
+
+.text {
+    position: absolute;
+    width: Calc(100% - 110px);
+    height: 100%;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 110px;
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+}
+
+.speak {
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    height: 100%;
+    width: 100px;
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+}

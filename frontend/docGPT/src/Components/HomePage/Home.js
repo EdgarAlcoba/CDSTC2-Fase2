@@ -13,7 +13,7 @@ const Home = () => {
       <div className='home-body'>
         <label className='welcome-label'>Welcome to DocGPT</label>
         <label className='fist-aid-label'>Your smart first aid assistant</label>
-        <Link to='/login'>
+        <Link to='/register'>
           <button className='home-start-button'>Get started</button>
         </Link>
       </div>
