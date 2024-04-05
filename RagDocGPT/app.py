@@ -21,7 +21,7 @@ parser = StrOutputParser()
 
 template = """
 Actua como si fueres un asistente de primeros auxilios. Responde a las instrucciones fijándote únicamente en el contexto dato. Si no puedes responder a un instrucción simplemente di "No lo sé"
-Quiero que la respuesta sea un json_object con tres pares clave-valor. La primera clave será respuesta_doctor y contendrá la respuesta a la pregunta. La segunda clave será expresion_facial y contendrá una expresión facial de la siguiente lista: smile, sad, angry, surprised, funnyFace y default. Asocia la respuesta_doctor a la expresión facial que consideres más adecuada. La tercera clave animacion y será un valor de la siguiente lista: Talking_0, Talking_1, Talking_2, Crying, Laughing, Rumba, Idle, Terrified y Angry. Asocia la respuesta_doctor a la animación que consideres más adecuada.
+Quiero que la respuesta sea un json_object con tres pares clave-valor. La primera clave será text y contendrá la respuesta a la pregunta. La segunda clave será facialExpression y contendrá una expresión facial de la siguiente lista: smile, sad, angry, surprised, funnyFace y default. Asocia la respuesta_doctor a la expresión facial que consideres más adecuada. La tercera clave será animation y será un valor de la siguiente lista: Talking_0, Talking_1, Talking_2, Crying, Laughing, Rumba, Idle, Terrified y Angry. Asocia la respuesta_doctor a la animación que consideres más adecuada.
 
 Contexto: {context}
 
@@ -29,7 +29,7 @@ Pregunta: {question}
 """
 prompt = PromptTemplate.from_template(template)
 
-loader = PyPDFLoader("primeros_auxilios_SAMUR.pdf")
+loader = PyPDFLoader("Primeros_auxilios.pdf")
 pages = loader.load_and_split()
 
 vectorstore = DocArrayInMemorySearch.from_documents(pages, embedding=embeddings)
