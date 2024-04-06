@@ -37,8 +37,8 @@ const facialExpressions = {
     mouthSmileRight: 0.35499733688813034,
   },
   sad: {
-    mouthFrownLeft: 1,
-    mouthFrownRight: 1,
+    mouthFrownLeft: 0.65,
+    mouthFrownRight: 0.65,
     mouthShrugLower: 0.78341,
     browInnerUp: 0.452,
     eyeSquintLeft: 0.72,
@@ -116,10 +116,10 @@ export function Avatar(props) {
 
 
   useEffect(() => {
-    console.log(message);
+    /*console.log(message);
     console.log(actions);
     console.log(animation);
-    console.log(animations);
+    console.log(animations);*/
     if (!message) {
       setAnimation("Standing");
       return;
@@ -140,10 +140,10 @@ export function Avatar(props) {
   const [animation, setAnimation] = useState(
     animations.find((a) => a.name === "Standing") ? "Standing" : animations[0].name // Check if Idle animation exists otherwise use first animation
   );
-  console.log("Valor de animation:", animation);
+  /*console.log("Valor de animation:", animation);
   console.log("Animaciones disponibles:", animations);
   console.log("Acciones:", actions);
-  console.log("Mixer:", mixer);
+  console.log("Mixer:", mixer);*/
   useEffect(() => {
     if (!actions[animation]) {
       console.error(`La animación ${animation} no está definida.`);

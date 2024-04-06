@@ -20,8 +20,9 @@ embeddings = OpenAIEmbeddings()
 parser = StrOutputParser()
 
 template = """
-Actua como si fueres un asistente de primeros auxilios. Responde a las instrucciones fijándote únicamente en el contexto dato. Si no puedes responder a un instrucción simplemente di "No lo sé"
-Quiero que la respuesta sea un json_object con tres pares clave-valor. La primera clave será text y contendrá la respuesta a la pregunta. La segunda clave será facialExpression y contendrá una expresión facial de la siguiente lista: smile, sad, angry, surprised, funnyFace y default. Asocia la respuesta_doctor a la expresión facial que consideres más adecuada. La tercera clave será animation y será un valor de la siguiente lista: Talking_0, Talking_1, Talking_2, Crying, Laughing, Rumba, Idle, Terrified y Angry. Asocia la respuesta_doctor a la animación que consideres más adecuada.
+Actua como si fueras un asistente de primeros auxilios. Responde como si estuvieras hablando directamente al paciente. Responde a las instrucciones fijándote únicamente en el contexto dado. Si no puedes responder a un instrucción simplemente di "No lo sé, contacta con un profesional para obtener ayuda". Si la emergencia es grave debes hacer énfasis en que tu paciente debe buscar atención médica profesional.
+Quiero que la respuesta sea un json_object con tres pares clave-valor. Las claves deben estar entre comillas "". La primera clave será text y contendrá la respuesta a la pregunta. La segunda clave será facialExpression y contendrá una expresión facial de la siguiente lista: default, smile, sad y angry. Asocia la respuesta_doctor a la expresión facial que consideres más adecuada. La tercera clave será animation y será un valor de la siguiente lista: Standing, StandingBetter, TalkingArm, TalkingSeriously, TalkingTwoArms, TextingWhileStanding. Asocia la respuesta_doctor a la animación que consideres más adecuada.
+Repply in the same lenguage as the next Pregunta content.
 
 Contexto: {context}
 
@@ -29,7 +30,7 @@ Pregunta: {question}
 """
 prompt = PromptTemplate.from_template(template)
 
-loader = PyPDFLoader("Primeros_auxilios.pdf")
+loader = PyPDFLoader("ilovepdf_merged.pdf")
 pages = loader.load_and_split()
 
 vectorstore = DocArrayInMemorySearch.from_documents(pages, embedding=embeddings)

@@ -33,6 +33,7 @@ nav {
     align-items: center;
     justify-content: space-between;
     min-height: 90px;
+    max-height: 10vh;
     box-shadow: 5px 20px 30px rgba(0, 0, 0, 0.5);
     background-color: #69b4e4e5;
 }

@@ -9,10 +9,6 @@ const RegisterForm = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log(data.get("password"));
-    console.log(data.get("repeat-password"));
-    console.log(data.get("password") == data.get("repeat-password"));
-    console.log(data.get("password") === data.get("repeat-password"))
     if (data.get("password") === data.get("repeat-password")) {
       axios
         .post("http://localhost:5000/api/register", {

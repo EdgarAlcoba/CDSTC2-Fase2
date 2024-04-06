@@ -7,7 +7,7 @@ import { Loader } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Experience } from "../3D_Avatar/Experience";
 import { Leva } from "leva";
-import { useChat } from './useChat';
+import { useChat } from '../../hooks/useChat';
 
 const Chat = () => {
   const userID = useParams().userID;
@@ -69,10 +69,10 @@ const Chat = () => {
   }
 
   const handleSubmit = (event) => {
-    
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const packetMessage = data.get("messageBox");
+    console.log(packetMessage);
     axios
       .put(`http://localhost:5000/api/chat/${userID}/${conversations[selectedButton]._id}`, {
         type: "User",
@@ -98,7 +98,8 @@ const Chat = () => {
           });*/
       })
       .catch(function (error) {
-        alert(error.response.data);
+        console.error(error);
+        alert(error);
       });
 
   };
@@ -123,7 +124,7 @@ const Chat = () => {
         <div className='docChat-container'>
           <div className='Avatar'>
             <Loader />
-            <Leva />
+            <Leva hidden/>
             <Canvas shadows camera={{ position: [0, 0, 1], fov: 30 }}>
               <Experience />
             </Canvas>
@@ -138,7 +139,7 @@ const Chat = () => {
             ))}
           </div>
         </div>
-        {selectedButton?<form className='chat-box' onSubmit={handleSubmit}>
+        {selectedButton!==null?<form className='chat-box' onSubmit={handleSubmit}>
           <input type='text' name="messageBox" placeholder='Message...' required></input>
           <button type='submit' disabled={loading}>Send</button>
         </form>:<></>}

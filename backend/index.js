@@ -11,7 +11,7 @@ app.use(cors());
 app.use("/api/login", require("./routes/login"));
 app.use("/api/register", require("./routes/register"));
 app.use("/api/chat", require("./routes/user"));
-//app.use("/api/avatar", require("./routes/avatar"));
+app.use("/api/avatar", require("./routes/avatar"));
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static("../frontend/docGPT/build"));

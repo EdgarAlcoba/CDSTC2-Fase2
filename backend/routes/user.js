@@ -5,6 +5,8 @@ const User = require("../models/User");
 const Conversation = require("../models/Conversation");
 const Message = require("../models/Message");
 
+const axios = require('axios');
+
 router.get("/:userID", async function (req, res) {
     const userID = req.params.userID;
 
@@ -132,10 +134,11 @@ router.put("/:userID/:conversationID", async function (req, res) {
     }
 });
 
-router.get("/:userID/:conversationID/messageAI", async function (req, res) {
+router.post("/:userID/:conversationID/messageAI", async function (req, res) {
     const userID = req.params.userID;
     const conversationID = req.params.conversationID;
     const messageContent = req.body.message;
+    //console.log("MessageContent", messageContent);
 
     if (!messageContent) {
         return res.status(400).send("Message not found");
@@ -160,15 +163,21 @@ router.get("/:userID/:conversationID/messageAI", async function (req, res) {
     } else {
         res.status(400).send("ConversationID not valid");
     }
-
-    //TODO hacer llamada a la api del modelo
-
-    const aiMessage = "";
+/*
+    let aiResponse = "";
+    try {
+        const response = await axios.post('http://localhost:5000/api/avatar', {
+            message: messageContent.message
+        });
+        aiResponse = response.data;
+    } catch (error) {
+        return res.status(400).send("Error creating media");
+    }*/
 
     try {
         const message = new Message({
             type: "DocGPT",
-            message: aiMessage
+            message: messageContent
         });
         await message.save();
         conversation.messages.push(message._id);

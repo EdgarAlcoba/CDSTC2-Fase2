@@ -12,15 +12,44 @@ services:
       - "3000:3000"
     environment:
       - WATCHPACK_POLLING=true #Necesario para usuarios con windows
+    networks:
+      docnet:
+        ipv4_address: 10.10.10.4
 
   backend:
     build: ./backend
-    restart: always
     container_name: backend-container
     volumes:
-      - ./backend:/backend:ro
+      - ./backend:/backend/audios:rw
     ports:
       - "5000:5000"
     environment:
       - MONGO_URI=${MONGO_URI}
       - NODE_ENV=${NODE_ENV}
+      - SECRET_KEY=${SECRET_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ELEVEN_LABS_API_KEY=${ELEVEN_LABS_API_KEY}
+    networks:
+      docnet:
+        ipv4_address: 10.10.10.5
+
+  rag:
+    build: ./RagDocGPT
+    container_name: docgpt-rag-system
+    volumes:
+      - ./RagDocGPT:/RagDocGPT:ro
+    ports:
+      - "8080:8080"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - FLASK_APP = app.py
+    networks:
+      docnet:
+        ipv4_address: 10.10.10.6
+
+networks:
+  docnet:
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+

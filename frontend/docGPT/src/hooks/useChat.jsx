@@ -6,15 +6,18 @@ const ChatContext = createContext();
 
 export const ChatProvider = ({ children }) => {
   const chat = async (message) => {
+    console.log(message);
+    console.log(JSON.stringify(message));
     setLoading(true);
-    const data = await fetch(`${backendUrl}/avatar/${message.userID}/${message.conversationID}`, {
+    const data = await fetch(`${backendUrl}/api/avatar`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ string:message.message }),
+      body: JSON.stringify(message),
     });
     const resp = (await data.json()).messages;
+    console.log(resp);
     setMessages((messages) => [...messages, ...resp]);
     setLoading(false);
   };

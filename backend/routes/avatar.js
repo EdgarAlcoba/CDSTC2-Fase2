@@ -1,21 +1,29 @@
-import { exec } from "child_process";
-import dotenv from "dotenv";
-import voice from "elevenlabs-node";
-import fsi from 'fs';
-
-import { promises as fs } from "fs";
-import OpenAI from "openai";
-dotenv.config();
+const express = require("express");
+const router = express.Router();
+const { exec } = require("child_process");
+const dotenv = require("dotenv");
+const ElevenLabs = require("elevenlabs-node");
+const elevenLabsApiKey = process.env.ELEVEN_LABS_API_KEY;
+const voiceID = "Rfj8YxsU5Gg9QdQE7F9O";
+const voice = new ElevenLabs(
+  {
+    apiKey: elevenLabsApiKey, // Your API key from Elevenlabs
+    voiceId: voiceID,             // A Voice ID from Elevenlabs
+  }
+);
+const fsi = require('fs');
 
 const axios = require('axios');
+
+const fs = require('fs').promises;
+const OpenAI = require("openai");
+//dotenv.config();
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "-",
 });
-console.log(process.env.OPENAI_API_KEY);
 
-const elevenLabsApiKey = process.env.ELEVEN_LABS_API_KEY;
-const voiceID = "Rfj8YxsU5Gg9QdQE7F9O";
+//console.log(elevenLabsApiKey, process.env.OPENAI_API_KEY)
 
 const execCommand = (command) => {
   return new Promise((resolve, reject) => {
@@ -29,16 +37,7 @@ const execCommand = (command) => {
 const lipSyncMessage = async (message) => {
   const time = new Date().getTime();
   console.log(`Starting conversion for message ${message}`);
-  try {
-    const archivos = fsi.readdirSync(directorioAudios);
-    console.log('Archivos en el directorio:');
-    archivos.forEach(archivo => {
-      console.log(archivo);
-    });
-  } catch (error) {
-    console.error('Error al leer el directorio:', error);
-  }
-
+  console.log("Petición ffmpeg");
   await execCommand(
     `ffmpeg -y -i ./audios/message_${message}.mp3 ./audios/message_${message}.wav`
   );
@@ -50,7 +49,7 @@ const lipSyncMessage = async (message) => {
   console.log(`Lip sync done in ${new Date().getTime() - time}ms`);
 };
 
-app.post("/", async (req, res) => {
+router.post("/", async (req, res) => {
   const userMessage = req.body.message;
   if (!userMessage) {
     res.send({
@@ -73,6 +72,12 @@ app.post("/", async (req, res) => {
     });
     return;
   }
+  /*
+  console.log("User message", userMessage);
+  console.log("User ID", req.body.userID);
+  console.log("Conversation ID", req.body.conversationID);
+*/
+
   if (!elevenLabsApiKey || openai.apiKey === "-") {
     res.send({
       messages: [
@@ -96,9 +101,51 @@ app.post("/", async (req, res) => {
   }
 
   // TODO petición a http://localhost:8080/ask
-  //{question: userMessage}
+  console.log("Petición a python");
+  let aiResponse;
+  let messages = { messages: [] };
+  try {
+    const response = await axios.post('http://10.10.10.6:8080/ask', {
+      question: userMessage
+    });
+    // Aquí puedes manejar la response de la API externa
+    aiResponse = response.data;
+  } catch (error) {
+    // Manejo de errores
+    return res.status(400).send(error);
+    //return res.status(400).send("Error creating model message");
+  }
 
-  const completion = await openai.chat.completions.create({
+
+  //TODO petición a guardarMensaje localhost:5000/chat....
+  console.log("Petición a backend");
+  try {
+    const response = await axios.post(`http://localhost:5000/api/chat/${req.body.userID}/${req.body.conversationID}/messageAI`, {
+      message: aiResponse.text
+    });
+    // Aquí puedes manejar la response de la API externa
+    // console.log(response.data);
+  } catch (error) {
+    // Manejo de errores
+    return res.status(400).send("Error saving model message");
+  }
+  messages.messages.push(aiResponse);
+  
+  const directorioActual = process.cwd();
+
+// Lee el contenido del directorio
+  fsi.readdir(directorioActual, (err, archivos) => {
+  if (err) {
+    console.error('Error al leer el directorio:', err);
+    return;
+    }
+
+    console.log('Contenido del directorio actual:');
+    archivos.forEach(archivo => {
+      console.log(archivo);
+    });
+  });
+  /*const completion = await openai.chat.completions.create({
     model: "gpt-3.5-turbo-1106",
     max_tokens: 1000,
     temperature: 0.6,
@@ -122,7 +169,7 @@ app.post("/", async (req, res) => {
       },
     ],
   });
-  let messages = JSON.parse(completion.choices[0].message.content);
+  let messages = JSON.parse(completion.choices[0].message.content);*/
   if (messages.messages) {
     messages = messages.messages; // ChatGPT is not 100% reliable, sometimes it directly returns an array and sometimes a JSON object with a messages property
   }
@@ -131,8 +178,19 @@ app.post("/", async (req, res) => {
     // generate audio file
     const fileName = `./audios/message_${i}.mp3`; // The name of your audio file
     const textInput = message.text; // The text you wish to convert to speech
-    await voice.textToSpeech(elevenLabsApiKey, voiceID, fileName, textInput);
+    //console.log("TextInput",textInput);
+    //console.log(elevenLabsApiKey,"|",voiceID,"|",fileName,"|",textInput);
+    console.log("Petición audio");
+    await voice.textToSpeech({
+      // Required Parameters
+      fileName: fileName,
+      textInput: textInput,
+    }).then((res) => {
+      console.log(res);
+    });
+    //await voice.textToSpeech(elevenLabsApiKey, voiceID, fileName, textInput);
     // generate lipsync
+    console.log("Petición lipSync");
     await lipSyncMessage(i);
     message.audio = await audioFileToBase64(fileName);
     message.lipsync = await readJsonTranscript(`./audios/message_${i}.json`);
