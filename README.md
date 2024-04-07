@@ -9,7 +9,7 @@ Docker
 #### Paso 1:
 Clonar el proyecto
 #### Paso 2:
-Es necesario modificar las siguientes variables de entorno en el archivo docker-compose o incluirlas en tu sistema operativo
+Es necesario modificar las siguientes variables de entorno en el archivo docker-compose o incluirlas en tu sistema operativo  
 MONGO_URI = URL de tu base de datos  
 NODE_ENV = DEV ó PROD  
 SECRET_KEY = Cadena de 32 caracteres aleatorios  
